@@ -1,0 +1,193 @@
+sensor:
+  - platform: rest
+    name: printer_3d_sensor
+    resource: "http://10.0.1.24:7125/printer/objects/query?heater_bed&extruder&print_stats&toolhead&display_status&virtual_sdcard&gcode_move&filament_switch_sensor Filament"
+    json_attributes_path: "$.result.status"
+    json_attributes:
+      - heater_bed
+      - extruder
+      - print_stats
+      - toolhead
+      - display_status
+      - virtual_sdcard
+      - gcode_move
+      - "filament_switch_sensor Filament"
+    value_template: "OK"
+    force_update: true
+    scan_interval: 1
+
+  - platform: rest
+    name: printer_3d_info
+    scan_interval: 1
+    resource_template: "http://10.0.1.24:7125/printer/info"
+    json_attributes_path: "$.result"
+    json_attributes:
+      - state_message
+      - state
+    value_template: "OK"
+
+  - platform: rest
+    scan_interval: 15
+    name: klipper_preview_path
+    resource_template: "http://10.0.1.24:7125/server/files/metadata?filename={{ states(('sensor.3d_printer_current_print')) }}"
+    json_attributes_path: "$.result.thumbnails.[1]"
+    json_attributes:
+      - relative_path
+      - width
+      - height
+      - size
+    value_template: "OK"
+
+  - platform: template
+    sensors:
+      3d_printer_hotend_target:
+        friendly_name: "Hotend Target"
+        value_template: '{{ states.sensor.printer_3d_sensor.attributes["extruder"]["target"]  | float | round(1) }}'
+        device_class: temperature
+        unit_of_measurement: "°C"
+        icon_template: mdi:thermometer
+      3d_printer_hotend_actual:
+        friendly_name: "Hotend Actual"
+        value_template: '{{ states.sensor.printer_3d_sensor.attributes["extruder"]["temperature"]  | float | round(1) }}'
+        device_class: temperature
+        unit_of_measurement: "°C"
+        icon_template: mdi:thermometer
+      3d_printer_hotend_power:
+        friendly_name: "Hotend Power"
+        value_template: '{{ ((states.sensor.printer_3d_sensor.attributes["extruder"]["power"]  | float) * 100) | round(0) }}'
+        unit_of_measurement: "%"
+        icon_template: mdi:flash
+      3d_printer_bed_target:
+        friendly_name: "Bed Target"
+        value_template: '{{ states.sensor.printer_3d_sensor.attributes["heater_bed"]["target"]  | float | round(1) }}'
+        device_class: temperature
+        unit_of_measurement: "°C"
+        icon_template: mdi:thermometer
+      3d_printer_bed_actual:
+        friendly_name: "Bed Actual"
+        value_template: '{{ states.sensor.printer_3d_sensor.attributes["heater_bed"]["temperature"]  | float | round(1) }}'
+        device_class: temperature
+        unit_of_measurement: "°C"
+        icon_template: mdi:thermometer
+      3d_printer_bed_power:
+        friendly_name: "Bed Power"
+        value_template: '{{ ((states.sensor.printer_3d_sensor.attributes["heater_bed"]["power"]  | float) * 100) | round(0) }}'
+        unit_of_measurement: "%"
+        icon_template: mdi:flash
+      3d_printer_state:
+        friendly_name: "Printer State"
+        value_template: '{{ states.sensor.printer_3d_sensor.attributes["print_stats"]["state"]}}'
+        icon_template: >
+          {% set val =  states.sensor.printer_3d_sensor.attributes["print_stats"]["state"]  %}
+          {% if val == 'standby' %}
+            mdi:sleep
+          {% elif val == 'error' %}
+            mdi:alert-circle
+          {% elif val == 'printing' %}
+            mdi:printer-3d-nozzle
+          {% elif val == 'paused' %}
+            mdi:pause-circle
+          {% elif val == 'complete' %}
+            mdi:printer-3d
+          {% else %}
+            mdi:help-circle
+          {% endif %}
+      3d_printer_current_print:
+        friendly_name: "Current Print"
+        value_template: '{{ states.sensor.printer_3d_sensor.attributes["print_stats"]["filename"]}}'
+      3d_printer_current_progress:
+        friendly_name: "Progress"
+        value_template: '{{ ((states.sensor.printer_3d_sensor.attributes["display_status"]["progress"])*100) | round(0, "floor") }}'
+        unit_of_measurement: "%"
+        icon_template: mdi:progress-clock
+      3d_printer_print_time:
+        friendly_name: "Time Elapsed"
+        value_template: '{{ states.sensor.printer_3d_sensor.attributes["print_stats"]["print_duration"] |timestamp_custom("%H:%M:%S", 0)}}'
+        icon_template: mdi:camera-timer
+      3d_printer_time_remaining:
+        friendly_name: "Time Remaining"
+        value_template: '{{ (((states.sensor.printer_3d_sensor.attributes["print_stats"]["print_duration"]/states.sensor.printer_3d_sensor.attributes["display_status"]["progress"]- states.sensor.printer_3d_sensor.attributes["print_stats"]["print_duration"]) if states.sensor.printer_3d_sensor.attributes["display_status"]["progress"]>0 else 0)) | timestamp_custom("%H:%M:%S", 0)}}'
+        icon_template: mdi:timer-sand
+      3d_printer_eta:
+        friendly_name: "ETA"
+        value_template: '{{ (as_timestamp(now())+2*60*60+((states.sensor.printer_3d_sensor.attributes["print_stats"]["print_duration"]/states.sensor.printer_3d_sensor.attributes["display_status"]["progress"]- states.sensor.printer_3d_sensor.attributes["print_stats"]["print_duration"]) if states.sensor.printer_3d_sensor.attributes["display_status"]["progress"]>0 else 0)) | timestamp_custom("%H:%M:%S", 0)}}'
+        icon_template: mdi:av-timer
+      3d_printer_message:
+        friendly_name: "Message"
+        value_template: '{{ states.sensor.printer_3d_sensor.attributes["display_status"]["message"]}}'
+      3d_printer_layer_height:
+        friendly_name: "Layer Height"
+        value_template: '{{ states.sensor.printer_3d_file_metadata.attributes["layer_height"] | float }}'
+        unit_of_measurement: "mm"
+        icon_template: mdi:arrow-collapse-down
+      3d_printer_object_height:
+        friendly_name: "Object Height"
+        value_template: '{{ (states.sensor.printer_3d_file_metadata.attributes["object_height"] | float) - (states.sensor.printer_3d_file_metadata.attributes["layer_height"] | float) }}'
+        unit_of_measurement: "mm"
+        icon_template: mdi:arrow-expand-vertical
+      3d_printer_current_height:
+        friendly_name: "Current Height"
+        value_template: '{{ states.sensor.printer_3d_sensor.attributes["gcode_move"]["gcode_position"][2]  | float | round(2) }}'
+        unit_of_measurement: "mm"
+        icon_template: mdi:arrow-collapse-down
+      3d_printer_current_layer:
+        friendly_name: "Current Layer"
+        value_template: '{{ (states("sensor.3d_printer_current_height")|float / states("sensor.3d_printer_layer_height")|float)|round(0) }}'
+      3d_printer_total_layers:
+        friendly_name: "Total Layers"
+        value_template: '{{ (states("sensor.3d_printer_object_height")|float / states("sensor.3d_printer_layer_height")|float)|round(0) }}'
+      3d_printer_object_thumbnails:
+        friendly_name: "Object Thumbnails"
+        value_template: '{{ states.sensor.printer_3d_file_metadata.attributes["thumbnails"][1]["relative_path"] }}'
+        icon_template: mdi:image
+      3d_printer_state_message:
+        friendly_name: "State Message"
+        value_template: '{{ states.sensor.printer_3d_info.attributes["state_message"] }}'
+      3d_printer_heaters_power:
+        friendly_name: "Bed and Nozzle Power"
+        value_template: '{{ states("sensor.3d_printer_bed_power") }}% / {{ states("sensor.3d_printer_hotend_power") }}%'
+
+binary_sensor:
+  - platform: template
+    sensors:
+      3d_printer_filament:
+        friendly_name: "Filament Detected"
+        icon_template: mdi:printer-3d-nozzle-alert
+        device_class: motion
+        value_template: >-
+          {{ states.sensor.printer_3d_sensor.attributes["filament_switch_sensor Filament"]["filament_detected"] }}
+
+rest:
+  scan_interval: 5
+  resource_template: "http://10.0.1.24:7125/server/files/metadata?filename={{ states(('sensor.3d_printer_current_print')) }}"
+  sensor:
+    - name: printer_3d_file_metadata
+      json_attributes_path: "$.result"
+      json_attributes:
+        - layer_height
+        - object_height
+        - thumbnails
+      value_template: "OK"
+
+camera:
+  - platform: generic
+    name: "3D Printer Thumbnail"
+    still_image_url: http://10.0.1.24:7125/server/files/gcodes/{{ states("sensor.3d_printer_object_thumbnails") }}
+    verify_ssl: false
+
+rest_command:
+  3d_printer_emergency_stop:
+    url: "http://10.0.1.24:7125/printer/emergency_stop"
+    method: post
+  3d_printer_firmware_restart:
+    url: "http://10.0.1.24:7125/printer/firmware_restart"
+    method: post
+  3d_printer_cancel:
+    url: "http://10.0.1.24:7125/printer/print/cancel"
+    method: post
+  3d_printer_pause:
+    url: "http://10.0.1.24:7125/printer/print/pause"
+    method: post
+  3d_printer_resume:
+    url: "http://10.0.1.24:7125/printer/print/resume"
+    method: post

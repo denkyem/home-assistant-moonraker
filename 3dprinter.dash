@@ -1,0 +1,181 @@
+#
+# Main arguments, all optional
+#
+title: 3D Printer
+widget_dimensions: [120, 50]
+widget_margins: [4, 4]
+widget_size: [1, 2]
+columns: 8
+global_parameters:
+    use_comma: 0
+    precision: 1
+    use_hass_icon: 1
+    namespace: default
+    devices:
+      media_player:
+        step: 5
+
+office:
+  widget_type: navigate
+  title: Office
+  dashboard: Office
+  icon_inactive: mdi-desk-lamp
+
+main_dash:
+  widget_type: navigate
+  title: Main
+  dashboard: Main
+  icon_inactive: mdi-view-dashboard
+  args:
+    sticky: 1
+
+label:
+  widget_type: label
+  text: "Ender 3 V2"
+
+
+3d_printer_switch:
+  widget_type: switch
+  title: 3D Printer
+  entity: switch.3d_printer
+  warn: 1
+  state_text: 1
+  state_map:
+    "on": "On"
+    "off": "Off"
+
+bed_temperature:
+  widget_type: sensor
+  title: Bed
+  precision: 0
+  entity: sensor.3d_printer_bed_actual
+  sub_entity: sensor.3d_printer_bed_target
+
+nozzle_temperature:
+  widget_type: sensor
+  title: Nozzle
+  precision: 0
+  entity: sensor.3d_printer_hotend_actual
+  sub_entity: sensor.3d_printer_hotend_target
+
+3d_printer_state:
+  widget_type: sensor
+  title: Status
+  entity: sensor.3d_printer_state
+  sub_entity: sensor.3d_printer_print_time
+  state_map:
+    "printing": Printing
+    "standby": "Stand-by"
+    "complete": "Complete"
+
+3d_printer_time:
+  widget_type: sensor
+  title: Remaining Time
+  entity: sensor.3d_printer_time_remaining
+  sub_entity: sensor.3d_printer_eta
+
+
+3d_printer_message:
+  widget_type: sensor
+  entity: sensor.3d_printer_message
+
+3d_printer_state_message:
+  widget_type: sensor
+  entity: sensor.3d_printer_state_message
+
+3d_printer_current_print:
+  widget_type: sensor
+  entity: sensor.3d_printer_current_print
+
+3d_printer_camera:
+  widget_type: camera
+  entity: camera.3d_printer
+  base_url: https://ha.cookieland.pt
+  stream: 1
+  widget_style: "background: transparent;"
+
+3d_printer_thumbnail:
+  widget_type: camera
+  entity: camera.3d_printer_thumbnail
+  base_url: https://ha.cookieland.pt
+  refresh: 60
+
+3d_printer_emergency_stop:
+  widget_type: script
+  entity: script.3d_printer_emergency_stop
+  title: Emergency Stop
+  icon_style_inactive: "color: $red;"
+
+3d_printer_firmware_restart:
+  widget_type: script
+  entity: script.3d_printer_firmware_restart
+  title: Firmware Restart
+  icon_style_inactive: "color: $green;"
+
+3d_printer_pause:
+  widget_type: script
+  entity: script.3d_printer_pause
+  title: Pause
+  icon_style_inactive: "color: $yellow;"
+
+3d_printer_cancel:
+  widget_type: script
+  entity: script.3d_printer_cancel
+  title: Cancel
+  icon_style_inactive: "color: $red;"
+
+3d_printer_resume:
+  widget_type: script
+  entity: script.3d_printer_resume
+  title: Resume
+  icon_style_inactive: "color: $green;"
+
+3d_printer_power:
+  widget_type: sensor
+  title: Power
+  precision: 0.1
+  entity: sensor.3d_printer_power_meter
+  sub_entity: sensor.3d_printer_heaters_power
+
+3d_printer_progress:
+  widget_type: gauge
+  title: Progress
+  entity: sensor.3d_printer_current_progress
+  max: 100
+  min: 0
+  units: "%"
+  color: $white
+  low_color: $blue
+  med_color: $blue
+  high_color: $blue
+
+3d_printer_filament:
+  widget_type: icon
+  title: Filament
+  entity: binary_sensor.3d_printer_filament
+  state_text: 1
+  state_map:
+    "on": Detected
+    "off": "Not detected"
+  icons:
+    "on":
+      icon: mdi-printer-3d-nozzle-outline
+      style: "color: $green;"
+    "off":
+      icon: mdi-printer-3d-nozzle-alert
+      style: "color: $red;"
+
+
+
+layout:
+    - include: top_panel
+    - label (8x1)
+    - 3d_printer_state, 3d_printer_thumbnail (1x2), 3d_printer_message (3x1), 3d_printer_camera (3x4)
+    - 3d_printer_current_print (3x1)
+    - 3d_printer_time, 3d_printer_progress, bed_temperature (1x2), nozzle_temperature (1x2), 3d_printer_filament
+    - spacer (6x1)
+    - spacer (8x1)
+    - spacer (8x1)
+    - 3d_printer_switch (1x2), 3d_printer_power (1x2), 3d_printer_pause, 3d_printer_cancel, 3d_printer_resume, spacer (1x1), office (1x2), main_dash
+    - spacer (1x1)
+    - 3d_printer_emergency_stop, 3d_printer_firmware_restart, 3d_printer_state_message (4x1)
