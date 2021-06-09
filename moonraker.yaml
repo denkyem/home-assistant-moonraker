@@ -1,7 +1,45 @@
+rest:
+  scan_interval: 5
+  resource_template: "http://<moonraker-ip-address>:7125/server/files/metadata?filename={{ states(('sensor.3d_printer_current_print')) }}"
+  sensor:
+    - name: printer_3d_file_metadata
+      json_attributes_path: "$.result"
+      json_attributes:
+        - layer_height
+        - object_height
+        - thumbnails
+      value_template: "OK"
+
+camera:
+  - platform: generic
+    name: "3D Printer Thumbnail"
+    still_image_url: http://<moonraker-ip-address>:7125/server/files/gcodes/{{ states("sensor.3d_printer_object_thumbnails") }}
+    verify_ssl: false
+
+rest_command:
+  3d_printer_emergency_stop:
+    url: "http://<moonraker-ip-address>:7125/printer/emergency_stop"
+    method: post
+  3d_printer_firmware_restart:
+    url: "http://<moonraker-ip-address>:7125/printer/firmware_restart"
+    method: post
+  3d_printer_cancel:
+    url: "http://<moonraker-ip-address>:7125/printer/print/cancel"
+    method: post
+  3d_printer_pause:
+    url: "http://<moonraker-ip-address>:7125/printer/print/pause"
+    method: post
+  3d_printer_resume:
+    url: "http://<moonraker-ip-address>:7125/printer/print/resume"
+    method: post
+
+
+
+
 sensor:
   - platform: rest
     name: printer_3d_sensor
-    resource: "http://10.0.1.24:7125/printer/objects/query?heater_bed&extruder&print_stats&toolhead&display_status&virtual_sdcard&gcode_move&filament_switch_sensor Filament"
+    resource: "http://<moonraker-ip-address>:7125/printer/objects/query?heater_bed&extruder&print_stats&toolhead&display_status&virtual_sdcard&gcode_move&filament_switch_sensor Filament"
     json_attributes_path: "$.result.status"
     json_attributes:
       - heater_bed
@@ -19,7 +57,7 @@ sensor:
   - platform: rest
     name: printer_3d_info
     scan_interval: 1
-    resource_template: "http://10.0.1.24:7125/printer/info"
+    resource_template: "http://<moonraker-ip-address>:7125/printer/info"
     json_attributes_path: "$.result"
     json_attributes:
       - state_message
@@ -29,7 +67,7 @@ sensor:
   - platform: rest
     scan_interval: 15
     name: klipper_preview_path
-    resource_template: "http://10.0.1.24:7125/server/files/metadata?filename={{ states(('sensor.3d_printer_current_print')) }}"
+    resource_template: "http://<moonraker-ip-address>:7125/server/files/metadata?filename={{ states(('sensor.3d_printer_current_print')) }}"
     json_attributes_path: "$.result.thumbnails.[1]"
     json_attributes:
       - relative_path
@@ -157,37 +195,3 @@ binary_sensor:
         value_template: >-
           {{ states.sensor.printer_3d_sensor.attributes["filament_switch_sensor Filament"]["filament_detected"] }}
 
-rest:
-  scan_interval: 5
-  resource_template: "http://10.0.1.24:7125/server/files/metadata?filename={{ states(('sensor.3d_printer_current_print')) }}"
-  sensor:
-    - name: printer_3d_file_metadata
-      json_attributes_path: "$.result"
-      json_attributes:
-        - layer_height
-        - object_height
-        - thumbnails
-      value_template: "OK"
-
-camera:
-  - platform: generic
-    name: "3D Printer Thumbnail"
-    still_image_url: http://10.0.1.24:7125/server/files/gcodes/{{ states("sensor.3d_printer_object_thumbnails") }}
-    verify_ssl: false
-
-rest_command:
-  3d_printer_emergency_stop:
-    url: "http://10.0.1.24:7125/printer/emergency_stop"
-    method: post
-  3d_printer_firmware_restart:
-    url: "http://10.0.1.24:7125/printer/firmware_restart"
-    method: post
-  3d_printer_cancel:
-    url: "http://10.0.1.24:7125/printer/print/cancel"
-    method: post
-  3d_printer_pause:
-    url: "http://10.0.1.24:7125/printer/print/pause"
-    method: post
-  3d_printer_resume:
-    url: "http://10.0.1.24:7125/printer/print/resume"
-    method: post
