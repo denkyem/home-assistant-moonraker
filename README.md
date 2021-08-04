@@ -9,6 +9,6 @@ To have all this sensors available on your Home Assistant you just need to copy 
 
 
 I'm using a [7" Touchscreen](https://www.amazon.es/gp/product/B07K32M4LJ/ref=ppx_yo_dt_b_asin_title_o02_s00?ie=UTF8&psc=1) connected to a Raspberry Pi 4B.
-I also design a case for this screen and it's available on [Thingiverse](https://www.thingiverse.com/thing:4880131)
+I also design a case for this screen and it's available on [Cults3D](https://cults3d.com/en/3d-model/gadget/touchscreen-7-case)
 
 ![screenshot](screenshot.png?raw=true)
