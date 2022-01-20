@@ -12,3 +12,10 @@ I'm using a [7" Touchscreen](https://www.amazon.es/gp/product/B07K32M4LJ/ref=ppx
 I also design a case for this screen and it's available on [Cults3D](https://cults3d.com/en/3d-model/gadget/touchscreen-7-case)
 
 ![screenshot](screenshot.png?raw=true)
+
+
+
+
+## Thank you
+
+<a href="https://www.buymeacoffee.com/denkyem" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png"></a>
