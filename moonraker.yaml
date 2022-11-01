@@ -115,7 +115,7 @@ template:
         friendly_name: "Hotend Actual"
     - name: 3d_printer_hotend_power
       unique_id: "<moonraker-ip-address>c57a1e35-92fa-403e-b3cf-ec1e97ef94cf"
-      state: '{{ states.sensor.printer_3d_sensor.attributes["extruder"]["power"]  | float(0) | round(1) }}'
+      state: '{{ states.sensor.printer_3d_sensor.attributes["extruder"]["power"]  | float(0) | round(3) * 100}}'
       availability: >
         {% set items = ['sensor.printer_3d_sensor'] %}
         {{ expand(items)|rejectattr('state','in',['unknown','unavailable'])
@@ -148,7 +148,7 @@ template:
         friendly_name: "Bed Actual"
     - name: 3d_printer_bed_power
       unique_id: "<moonraker-ip-address>abb2fc5b-8173-4131-a942-fb11e30f4efa"
-      state: '{{ states.sensor.printer_3d_sensor.attributes["heater_bed"]["power"]  | float(0) | round(1) }}'
+      state: '{{ states.sensor.printer_3d_sensor.attributes["heater_bed"]["power"]  | float(0) | round(3) * 100 }}'
       availability: >
         {% set items = ['sensor.printer_3d_sensor'] %}
         {{ expand(items)|rejectattr('state','in',['unknown','unavailable'])
@@ -320,7 +320,7 @@ template:
         friendly_name: "State Message"
     - name: 3d_printer_heaters_power
       unique_id: "<moonraker-ip-address>3988e9be-c910-4634-8205-38d53170d5a5"
-      state: '{{ states("sensor.3d_printer_bed_power") }}% / {{ states("sensor.3d_printer_hotend_power") }}%'
+      state: '{{ states("sensor.3d_printer_bed_power")|float(0) | round(1) }}% / {{ states("sensor.3d_printer_hotend_power")|float(0) | round(1) }}%'
       availability: >
         {% set items = ['sensor.3d_printer_bed_power','sensor.3d_printer_hotend_power'] %}
         {{ expand(items)|rejectattr('state','in',['unknown','unavailable'])
