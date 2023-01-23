@@ -5,7 +5,7 @@ Integration between Moonraker and Home Assistant
 A lot of Template sensors and rest sensors to have all the information I need from Moonraker (Klipper) on Home Assistant.
 This way I can create a dashboard using HADashboard (AppDaemon) to monitoring my printer.
 
-To have all this sensors available on your Home Assistant you just need to copy ```moonraker.yaml``` to your packages folder and make sure you update the IP address. (Replace all instances of the text '<moonraker-ip-address>' in mookraker.yaml with the IP address of your installation.)
+To have all this sensors available on your Home Assistant you just need to copy ```moonraker.yaml``` to your packages folder and make sure you update the IP address. (Replace all instances of the text ```<moonraker-ip-address>``` in moonraker.yaml with the IP address of your installation.)
 
 If you are using this for multiple Printers in the same Home Assistant instance, be sure to adjust all the friendly names so that you don't end up with tha same name-2 (unless that works for you).  Do this before you reload HA or HA will generate all -2 entities and you will need to go thru them in HA and change the friendly names there. (That gets kind of messy.)  The rest, rest_command, camera, and sensor values will need to be changed and the templates adjusted to match those names.  This is not intended to be used with multiple printers, but it is indeed possible.
 
