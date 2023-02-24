@@ -90,14 +90,14 @@ nozzle_temperature:
 3d_printer_camera:
   widget_type: camera
   entity: camera.3d_printer
-  base_url: https://ha.cookieland.pt
+  base_url: HomeAssistant
   stream: 1
   widget_style: "background: transparent;"
 
 3d_printer_thumbnail:
   widget_type: camera
   entity: camera.3d_printer_thumbnail
-  base_url: https://ha.cookieland.pt
+  base_url: HomeAssistant
   refresh: 60
 
 3d_printer_emergency_stop:
